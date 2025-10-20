@@ -1,5 +1,7 @@
 # Changelog
 
+## [v0.73.0](https://github.com/aereal/octocov/commits/v0.73.0) - 2025-10-20
+
 ## [v0.73.0](https://github.com/k1LoW/octocov/compare/v0.72.1...v0.73.0) - 2025-09-25
 ### Other Changes
 - chore(deps): bump k1LoW/gostyle-action from 1.4.0 to 1.5.0 in the dependencies group by @dependabot[bot] in https://github.com/k1LoW/octocov/pull/560

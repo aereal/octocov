@@ -544,17 +544,20 @@ func (g *Gh) PutCommentWithDeletion(ctx context.Context, owner, repo string, n i
 func (g *Gh) PutArtifact(ctx context.Context, owner, repo string, runID int64, name, fp string, content []byte) error {
 	current, _, err := g.client.Actions.ListWorkflowRunArtifacts(ctx, owner, repo, runID, &github.ListOptions{})
 	if err != nil {
-		return err
+		return fmt.Errorf("github.ActionsService.ListWorkflowRunArtifacts: %w", err)
 	}
 	for _, a := range current.Artifacts {
 		if a.GetName() == name {
 			if _, err := g.client.Actions.DeleteArtifact(ctx, owner, repo, a.GetID()); err != nil {
-				return err
+				return fmt.Errorf("github.ActionsService.DeleteArtifact: %w", err)
 			}
 			break
 		}
 	}
-	return artifact.Upload(ctx, name, fp, bytes.NewReader(content))
+	if err := artifact.Upload(ctx, name, fp, bytes.NewReader(content)); err != nil {
+		return fmt.Errorf("artifact.Upload: %w", err)
+	}
+	return nil
 }
 
 type ArtifactFile struct {

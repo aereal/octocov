@@ -447,17 +447,18 @@ var rootCmd = &cobra.Command{
 		} else {
 			cmd.PrintErrln("Storing report...")
 			if c.Report.Path != "" {
-				rp, err := filepath.Abs(filepath.Clean(c.Report.Path))
+				cleanedPath := filepath.Clean(c.Report.Path)
+				rp, err := filepath.Abs(cleanedPath)
 				if err != nil {
-					return err
+					return fmt.Errorf("filepath.Abs(%s): %w", cleanedPath, err)
 				}
 				if err := os.WriteFile(rp, r.Bytes(), os.ModePerm); err != nil { //nolint:gosec
-					return err
+					return fmt.Errorf("os.WriteFile(%s): %w", rp, err)
 				}
 				addPaths = append(addPaths, rp)
 			}
 			if err := reportToDatastores(ctx, c, c.Report.Datastores, r); err != nil {
-				return err
+				return fmt.Errorf("reportToDatastores: %w", err)
 			}
 		}
 
@@ -559,11 +560,11 @@ func reportToDatastores(ctx context.Context, c *config.Config, datastores []stri
 		}
 		d, err := datastore.New(ctx, s, datastore.Root(c.Root()), datastore.Report(r))
 		if err != nil {
-			return err
+			return fmt.Errorf("datastore.New: %w", err)
 		}
 		log.Printf("Storing report to %s", s)
 		if err := d.StoreReport(ctx, r); err != nil {
-			return err
+			return fmt.Errorf("StoreReport: %w", err)
 		}
 	}
 	log.Println("Shrink report data")
@@ -579,11 +580,11 @@ func reportToDatastores(ctx context.Context, c *config.Config, datastores []stri
 		}
 		d, err := datastore.New(ctx, s, datastore.Root(c.Root()), datastore.Report(r))
 		if err != nil {
-			return err
+			return fmt.Errorf("datastore.New: %w", err)
 		}
 		log.Printf("Storing report to %s", s)
 		if err := d.StoreReport(ctx, r); err != nil {
-			return err
+			return fmt.Errorf("StoreReport: %w", err)
 		}
 	}
 	return nil

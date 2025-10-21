@@ -44,7 +44,7 @@ type Gh struct {
 func New() (*Gh, error) {
 	client, err := factory.NewGithubClient(factory.Timeout(10 * time.Second))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("factory.NewGithubClient: %w", err)
 	}
 
 	token, _, _, v4ep := factory.GetTokenAndEndpoints()

@@ -58,7 +58,7 @@ func (c *Config) TestExecutionTimeConfigReady() error {
 		return errors.New("testExecutionTime: is not set")
 	}
 	if err := c.CoverageConfigReady(); err != nil && len(c.TestExecutionTime.Steps) == 0 {
-		return err
+		return fmt.Errorf("CoverageConfigReady: %w", err)
 	}
 	ok, err := c.CheckIf(c.TestExecutionTime.If)
 	if err != nil {
@@ -79,7 +79,7 @@ func (c *Config) PushConfigReady() error {
 	}
 	ok, err := c.CheckIf(c.Push.If)
 	if err != nil {
-		return err
+		return fmt.Errorf("CheckIf: %w", err)
 	}
 	if !ok {
 		return fmt.Errorf("the condition in the `if` section is not met (%s)", c.Push.If)
@@ -97,17 +97,17 @@ func (c *Config) CommentConfigReady() error {
 	ctx := context.Background()
 	repo, err := gh.Parse(c.Repository)
 	if err != nil {
-		return err
+		return fmt.Errorf("gh.Parse: %w", err)
 	}
 	if c.gh == nil {
 		g, err := gh.New()
 		if err != nil {
-			return err
+			return fmt.Errorf("gh.New: %w", err)
 		}
 		c.gh = g
 	}
 	if _, err := c.gh.DetectCurrentPullRequestNumber(ctx, repo.Owner, repo.Repo); err != nil {
-		return err
+		return fmt.Errorf("DetectCurrentPullRequestNumber: %w", err)
 	}
 	ok, err := c.CheckIf(c.Comment.If)
 	if err != nil {
@@ -149,17 +149,17 @@ func (c *Config) BodyConfigReady() error {
 	ctx := context.Background()
 	repo, err := gh.Parse(c.Repository)
 	if err != nil {
-		return err
+		return fmt.Errorf("gh.Parse: %w", err)
 	}
 	if c.gh == nil {
 		g, err := gh.New()
 		if err != nil {
-			return err
+			return fmt.Errorf("gh.New: %w", err)
 		}
 		c.gh = g
 	}
 	if _, err := c.gh.DetectCurrentPullRequestNumber(ctx, repo.Owner, repo.Repo); err != nil {
-		return err
+		return fmt.Errorf("DetectCurrentPullRequestNumber: %w", err)
 	}
 	ok, err := c.CheckIf(c.Body.If)
 	if err != nil {
@@ -173,7 +173,7 @@ func (c *Config) BodyConfigReady() error {
 
 func (c *Config) CoverageBadgeConfigReady() error {
 	if err := c.CoverageConfigReady(); err != nil {
-		return err
+		return fmt.Errorf("CoverageConfigReady: %w", err)
 	}
 	if c.Coverage.Badge.Path == "" {
 		return errors.New("coverage.badge.path: is not set")
@@ -183,7 +183,7 @@ func (c *Config) CoverageBadgeConfigReady() error {
 
 func (c *Config) CodeToTestRatioBadgeConfigReady() error {
 	if err := c.CodeToTestRatioConfigReady(); err != nil {
-		return err
+		return fmt.Errorf("CodeToTestRatioConfigReady: %w", err)
 	}
 	if c.CodeToTestRatio.Badge.Path == "" {
 		return errors.New("codeToTestRatio.badge.path: is not set")
@@ -193,7 +193,7 @@ func (c *Config) CodeToTestRatioBadgeConfigReady() error {
 
 func (c *Config) TestExecutionTimeBadgeConfigReady() error {
 	if err := c.TestExecutionTimeConfigReady(); err != nil {
-		return err
+		return fmt.Errorf("TestExecutionTimeConfigReady: %w", err)
 	}
 	if c.TestExecutionTime.Badge.Path == "" {
 		return errors.New("testExecutionTime.badge.path: is not set")
@@ -277,7 +277,7 @@ func (c *Config) DiffConfigReady() error {
 
 func (c *Config) ReportConfigReady() error {
 	if err := c.ReportConfigTargetReady(); err != nil {
-		return err
+		return fmt.Errorf("ReportConfigTargetReady: %w", err)
 	}
 	ok, err := c.CheckIf(c.Report.If)
 	if err != nil {

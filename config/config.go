@@ -179,12 +179,13 @@ func (c *Config) Load(path string) error {
 	} else {
 		c.path = filepath.Join(c.wd, path)
 	}
-	buf, err := os.ReadFile(filepath.Clean(c.path))
+	cleanedPath := filepath.Clean(c.path)
+	buf, err := os.ReadFile(cleanedPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("os.ReadFile(%s): %w", cleanedPath, err)
 	}
 	if err := yaml.Unmarshal(expand.ExpandenvYAMLBytes(buf), c); err != nil {
-		return err
+		return fmt.Errorf("yaml.Unmarshal: %w", err)
 	}
 	return nil
 }
@@ -282,7 +283,7 @@ func coverageAcceptable(current, prev *big.Rat, cond string) error {
 	}
 	ok, err := expr.Eval(fmt.Sprintf("(%s) == true", cond), variables)
 	if err != nil {
-		return err
+		return fmt.Errorf("expr.Eval: %w", err)
 	}
 
 	tf, okk := ok.(bool)
@@ -320,7 +321,7 @@ func codeToTestRatioAcceptable(current, prev *big.Rat, cond string) error {
 	}
 	ok, err := expr.Eval(fmt.Sprintf("(%s) == true", cond), variables)
 	if err != nil {
-		return err
+		return fmt.Errorf("expr.Eval: %w", err)
 	}
 	tf, okk := ok.(bool)
 	if !okk {
@@ -341,7 +342,7 @@ func testExecutionTimeAcceptable(current, prev *big.Rat, cond string) error {
 	for _, m := range matches {
 		d, err := duration.Parse(m)
 		if err != nil {
-			return err
+			return fmt.Errorf("duration.Parse: %w", err)
 		}
 		cond = strings.Replace(cond, m, strconv.FormatFloat(float64(d), 'f', -1, 64), 1)
 	}
@@ -363,7 +364,7 @@ func testExecutionTimeAcceptable(current, prev *big.Rat, cond string) error {
 	}
 	ok, err := expr.Eval(fmt.Sprintf("(%s) == true", cond), variables)
 	if err != nil {
-		return err
+		return fmt.Errorf("expr.Eval: %w", err)
 	}
 
 	tf, okk := ok.(bool)

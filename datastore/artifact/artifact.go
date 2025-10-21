@@ -54,7 +54,7 @@ func (a *Artifact) StoreReport(ctx context.Context, r *report.Report) error {
 func (a *Artifact) Put(ctx context.Context, path string, content []byte) error {
 	r, err := gh.Parse(a.repository)
 	if err != nil {
-		return err
+		return fmt.Errorf("gh.Parse: %w", err)
 	}
 	s := os.Getenv("GITHUB_RUN_ID")
 	if s == "" {
@@ -64,7 +64,10 @@ func (a *Artifact) Put(ctx context.Context, path string, content []byte) error {
 	if err != nil {
 		return fmt.Errorf("failed to parse GITHUB_RUN_ID: %w", err)
 	}
-	return a.gh.PutArtifact(ctx, r.Owner, r.Repo, runID, a.name, path, content)
+	if err := a.gh.PutArtifact(ctx, r.Owner, r.Repo, runID, a.name, path, content); err != nil {
+		return fmt.Errorf("PutArtifact: %w", err)
+	}
+	return nil
 }
 
 func (a *Artifact) FS() (fs.FS, error) {

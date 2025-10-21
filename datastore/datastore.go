@@ -66,7 +66,7 @@ func New(ctx context.Context, u string, hints ...HintFunc) (Datastore, error) {
 	}
 	d, args, err := parse(u, h.root)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse: %w", err)
 	}
 	switch d {
 	case GitHub:
@@ -93,7 +93,7 @@ func New(ctx context.Context, u string, hints ...HintFunc) (Datastore, error) {
 		name := args[1]
 		g, err := gh.New()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("gh.New: %w", err)
 		}
 		return artifact.New(g, ownerrepo, name, h.report)
 	case S3:
